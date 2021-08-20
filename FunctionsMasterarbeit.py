@@ -1,15 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
 
 
 import sys
 sys.path.append('/usr/local/lib/python3.9/site-packages')
-
-
-# In[2]:
-
 
 import dionysus as d
 import numpy as np
@@ -25,10 +20,6 @@ import math
 from numpy import linalg as LA
 from networkx.generators.random_graphs import erdos_renyi_graph
 
-
-# In[3]:
-
-
 def findkcliques(max_cliques, k):
     #give back all subset cliques of order k from a list of maximal cliques
     Allkcliques=[]
@@ -40,10 +31,6 @@ def findkcliques(max_cliques, k):
     uniquecliques=[tuple(x) for x in uniquecliques]
     return uniquecliques
 
-
-# In[4]:
-
-
 def findallcliques(max_cliques,max_dim=100):
     # give back all subset from a list of maximal cliques
     Allkcliques=[]
@@ -54,20 +41,12 @@ def findallcliques(max_cliques,max_dim=100):
     Allkcliques1=list(itertools.chain(* Allkcliques))     
     return list(set( Allkcliques1))
 
-
-# In[5]:
-
-
 def ensureallfaces(simplex, dimensions = [2,3]):
     #give back all faces of "dimensions" of a simplex 
     faces=[]
     for dim in dimensions:
             faces.append(list(itertools.combinations(set(simplex), dim)))
     return list(itertools.chain(* faces))
-
-
-# In[6]:
-
 
 def getbackinverseVietorisrips(adjma, add_vertex_first = True):
     # compute the barcodes of the inverse Vietoris Rips (2.0)
@@ -97,9 +76,6 @@ def getbackinverseVietorisrips(adjma, add_vertex_first = True):
     return dgms
 
 
-# In[7]:
-
-
 def plotBarcodes(Barcodes,zigzag=False):
     #plot the Barcodes 
     numberofbars=sum([len(Barcodes[dim]) for dim in range(0,len(Barcodes))])
@@ -117,10 +93,12 @@ def plotBarcodes(Barcodes,zigzag=False):
             plt.xlim(xlimits)
             plt.ylim([0, max(numberofbars*0.2+0.4,4)])
             t=t+0.2
-
-
-# In[8]:
-
+def findPaths(G,u,n):
+    #find all the paths in G starting in u with maximal length n
+    if n==0:
+        return [[u]]
+    paths = [[u]+path for neighbor in G.neighbors(u) for path in findPaths(G,neighbor,n-1) if u not in path]
+    return paths
 
 def getkpowergraphadjma(nodes,allpaths,adjmatrix,k):
     #compute the adjacency matrix of the kth power-graph
@@ -140,10 +118,6 @@ def getkpowergraphadjma(nodes,allpaths,adjmatrix,k):
                 MA[i,j]=np.min(weithspaths)
                 MA[j,i]=MA[i,j]
     return MA
-
-
-# In[9]:
-
 
 def getkplex(adjmatrix,k):
     # give back the k-plexes of an graph
@@ -192,10 +166,6 @@ def getkplex(adjmatrix,k):
     kplex=[tuple(kplex[sort]) for sort in sortedplexes]
     return kplex
 
-
-# In[10]:
-
-
 def isakclub(nodes,allpaths,r): 
     #give back if r is a k-club
     complement=nodes-set(r)
@@ -214,10 +184,6 @@ def isakclub(nodes,allpaths,r):
                 MA[index1,index]=1
     return np.all(MA==ONES)
 
-
-# In[11]:
-
-
 def getallclubs(nodes,allpaths,clans,k):
     #give back all the k-clubs of a list of k-clans
     club=[]
@@ -225,10 +191,6 @@ def getallclubs(nodes,allpaths,clans,k):
         if isakclub(nodes,allpaths,clan):
             club.append(clan)
     return club
-
-
-# In[12]:
-
 
 def transformadjancymatrixkplex(adjancymatrix,maximalcliques,k):
     #transform the adjacency matrix if k-plex
@@ -241,10 +203,6 @@ def transformadjancymatrixkplex(adjancymatrix,maximalcliques,k):
             for index in loc1[0]:
                 adjancymatrix[:,cliques[loc[0][index]]][cliques[loc[1][index]]]=mini
     return(adjancymatrix)
-
-
-# In[13]:
-
 
 def givebackkcliqueMINadjmat(initialadjmatrix,kcliques):
     # give back the adjancency matrix of the k-connectivity graph
@@ -264,10 +222,6 @@ def givebackkcliqueMINadjmat(initialadjmatrix,kcliques):
                 MA[j,i]=min(Mini,Minj)           
     return MA
 
-
-# In[14]:
-
-
 def commonface(CC,sim):
     # give back the simplices which form a simplex in the common-face complex
     originalcliques=[CC[index] for index in np.asarray(sim)]
@@ -284,10 +238,6 @@ def commonface(CC,sim):
         loc=np.where(MA[i][:])[0]
         simplex.append([sim[index] for index in np.asarray(loc)])
     return(simplex)
-
-
-# In[15]:
-
 
 def getbackCCintervals(adjma,Cliques,pthhomo,Commonface):
     #gives back the barcodes of the k-clique connectivity graph 
@@ -321,10 +271,6 @@ def getbackCCintervals(adjma,Cliques,pthhomo,Commonface):
     dgms = d.init_diagrams(m, f)
     return dgms
 
-
-# In[16]:
-
-
 def traductionintervals (dgms,Homology_dimension_max,zigzag=False):
     #transform the death time of our barcodes "inf"->0, 
     # if zigzag "inf"->10
@@ -338,10 +284,6 @@ def traductionintervals (dgms,Homology_dimension_max,zigzag=False):
                 else:
                     intervals[i].append([pt.birth, pt.death])
     return intervals
-
-
-# In[17]:
-
 
 def indicator(intervals,delta,zigzag=False):
     # compute the persistence indicator function for the intervals 
@@ -357,10 +299,6 @@ def indicator(intervals,delta,zigzag=False):
             deathnum=sum(death<=delta[i]) if zigzag else sum(death>=delta[i])
             yy[i]=birthnum-deathnum;
     return yy
-
-
-# In[18]:
-
 
 def getcontinusweightmax(nbins,indi,newdelta,linSpace,dim,plot,kk,integral=False):
     # transform persistence indicator into discretize version
@@ -384,10 +322,6 @@ def getcontinusweightmax(nbins,indi,newdelta,linSpace,dim,plot,kk,integral=False
                 maax=max(maax,indi[min(index)-1])
         plot[(kk-2),thebins[bb]-1]=maax
     return plot
-
-
-# In[19]:
-
 
 def getplots(adjmatrix,maxdim,nbins,pthhomo=1,Commonface=False,kplex=False,kclub=False,k=0):
     #compute the plots 
@@ -436,22 +370,23 @@ def getplots(adjmatrix,maxdim,nbins,pthhomo=1,Commonface=False,kplex=False,kclub
             PLOT[pp]=getcontinusweightmax(nbins,indi,newdelta,linSpace,maxdim,PLOT[pp],cliquesize)
     return(PLOT)
 
-
-# In[20]:
-
+def symmetricrandommatrix(n,a,b):
+    #creates a full matrix with random numbers btw (a,b)
+    MA=np.zeros([n,n])
+    for i in range(0,n):
+        for j in range(i+1,n):
+            MA[i,j]=np.random.uniform(a,b)
+    MA=np.triu(MA)+np.transpose(np.triu(MA))
+    return MA
 
 def centralma(n,central=True):
     # simulate a initial graph for Barabasi with one central node or not
     t=0.7 if central else 0.3
-    MA=(np.random.rand(n,n)>t)*1
+    MA=(symmetricrandommatrix(n,0.001,1)>t)*1
     MA[0,:]=1;
     MA=np.triu(MA)+np.transpose(np.triu(MA))
     np.fill_diagonal(MA, 0)
     return(MA)
-
-
-# In[21]:
-
 
 def BarabasiAlbert(n,degree,seed):
     # create a Barabasi-Albert graphs with n nodes, degree, and initial matrix=seed
@@ -462,25 +397,9 @@ def BarabasiAlbert(n,degree,seed):
         p=np.random.choice(range(0,n),degree,replace=False, p=prob)
         MA[k+len(seed),p]=1
         MA[p,k+len(seed)]=1
-    MA=np.multiply(MA,np.random.rand(n,n))
+    MA=np.multiply(MA,symmetricrandommatrix(n,0.001,1))
     MA=np.triu(MA, 1)+ np.transpose(np.triu(MA, 1))
     return(MA)
-
-
-# In[22]:
-
-
-def symmetricrandommatrix(n,a,b):
-    #creates a full matrix with random numbers btw (a,b)
-    MA=np.zeros([n,n])
-    for i in range(0,n):
-        for j in range(i+1,n):
-            MA[i,j]=np.random.uniform(a,b)
-    MA=np.triu(MA)+np.transpose(np.triu(MA))
-    return MA
-
-
-# In[23]:
 
 
 def LtwodistanceMA(A):
@@ -494,10 +413,6 @@ def LtwodistanceMA(A):
     L2=L2/np.max(L2)
     return L2
 
-
-# In[24]:
-
-
 def pairwisewasserstein2(A):
     # the distance matrix for barcodes with 2-Wasserstein-distance
     DistanceMA=np.zeros((len(A),len(A)))
@@ -507,10 +422,6 @@ def pairwisewasserstein2(A):
             DistanceMA[j,i]=DistanceMA[i,j]
     DistanceMA=DistanceMA/np.max(DistanceMA)
     return DistanceMA
-
-
-# In[25]:
-
 
 def convertloctotimes(location):
     #from the location to the birth and death times of the simplices for dionysus
@@ -535,10 +446,6 @@ def convertloctotimes(location):
             times[i].append(10)
     return times
 
-
-# In[26]:
-
-
 def getbackzigzagintervals(Cliques):
     #get back zigzag Barcodes of the clique-complex
     Cliques=[findallcliques(Clique,max_dim=5) for Clique in Cliques]
@@ -558,10 +465,6 @@ def getbackzigzagintervals(Cliques):
     times=convertloctotimes(where1)
     zz, dgms, cells = d.zigzag_homology_persistence(f, times)
     return dgms
-
-
-# In[27]:
-
 
 def getthezigzagfiltration(Maximalcliques,cliquesize,num_nodes,common_face):
     #get back the list of simplices with birth and death time of the clique complex of the k-clique community graph
@@ -613,10 +516,6 @@ def getthezigzagfiltration(Maximalcliques,cliquesize,num_nodes,common_face):
                 whereAllKcliques.append(sorted(intersectionloc))
     return AllKcliques,whereAllKcliques
 
-
-# In[28]:
-
-
 def getbackplotszigzag(Maximalcliques,maxdim,num_nodes,common_face,plots_barcodes):
     #get back the plots for the zigzag k-clique connectivity graphs
     t=0
@@ -640,10 +539,6 @@ def getbackplotszigzag(Maximalcliques,maxdim,num_nodes,common_face,plots_barcode
             plots[pp]=getcontinusweightmax(10,indi,linSpace,linSpace,maxdim,plots[pp],cliquesize)
     return plots
 
-
-# In[29]:
-
-
 def getzigzag(list_adjmatrix,max_dim,kcliquecommu=False,common_face=False,plots_barcodes=False):   
     # from a list of adjmatrix compute zigzag of barcodes or the plot of the k-clique community zigzag
     adj_for_zigzag=[]
@@ -662,25 +557,10 @@ def getzigzag(list_adjmatrix,max_dim,kcliquecommu=False,common_face=False,plots_
         dgms=getbackzigzagintervals(Maximalcliques)
     return dgms
 
-
-# In[30]:
-
-
 def getpercentlimit(adjma, percent):
     #find the threshold i such that the matrix has maximal density "percent"
     for i in  np.arange(0,1,0.02):
         num=np.sum(adjma>=i)/(len(adjma)**2)
         if num < percent:
             return i
-
-
-# In[31]:
-
-
-def findPaths(G,u,n):
-    #find all the paths in G starting in u with maximal length n
-    if n==0:
-        return [[u]]
-    paths = [[u]+path for neighbor in G.neighbors(u) for path in findPaths(G,neighbor,n-1) if u not in path]
-    return paths
 
