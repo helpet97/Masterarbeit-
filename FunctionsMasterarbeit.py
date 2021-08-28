@@ -93,6 +93,7 @@ def plotBarcodes(Barcodes,zigzag=False):
             plt.xlim(xlimits)
             plt.ylim([0, max(numberofbars*0.2+0.4,4)])
             t=t+0.2
+            
 def findPaths(G,u,n):
     #find all the paths in G starting in u with maximal length n
     if n==0:
@@ -101,7 +102,7 @@ def findPaths(G,u,n):
     return paths
 
 def getkpowergraphadjma(nodes,allpaths,adjmatrix,k):
-    #compute the adjacency matrix of the kth power-graph
+    #compute the adjacency matrix of the kth power-graph 
     MA=np.zeros([len(nodes),len(nodes)])
     for i in range(0,len(nodes)):
         for j in range(i+1,len(nodes)):
